@@ -1,122 +1,332 @@
-// Банк слов. Ударная гласная обозначена заглавной буквой и знаком ударения.
+// Банк основан на актуальном орфоэпическом списке ФИПИ для подготовки к ЕГЭ-2026.
+// Заглавная гласная показывает ударение, как в формулировках задания № 4.
 const WORDS = [
-  ["звонИ́т","зво́нит"],["облегчИ́ть","обле́гчить"],["тОрты","торты́"],
-  ["красИ́вее","краси́вее"],["свЁкла","свекла́"],["каталО́г","катало́г"],
-  ["договОр","до́говор"],["диспансЕ́р","диспа́нсер"],["жалюзИ́","жа́люзи"],
-  ["киломЕ́тр","ки́лометр"],["квартА́л","ква́ртал"],["срЕ́дства","средства́"],
-  ["тУ́фля","туфля́"],["щавЕ́ль","ща́вель"],["цемЕ́нт","це́мент"],
-  ["шАрфы","шарфы́"],["бАнты","банты́"],["бОроду","бороду́"],
-  ["бухгАлтеров","бухгалтеро́в"],["включИ́т","вклю́чит"],["вО́время","вовре́мя"],["граждАнство","гражда́нство"],
-  ["дЕ́фис","дефи́с"],["дозвонИ́тся","дозво́нится"],["дО́низу","дони́зу"],
-  ["досУ́г","до́суг"],["еретИ́к","ере́тик"],["зА́годя","загодя́"],
-  ["закУ́порить","закупо́рить"],["знА́чимость","значи́мость"],["И́скра","искрА́"],
-  ["исчЕ́рпать","исчерпа́ть"],["кА́мбала","камбала́"],["кА́мбалу","камбалу́"],
-  ["кА́мни","камни́"],["кОнусов","конусо́в"],["кремЕ́нь","кре́мень"],
-  ["лЕ́кторы","лекторы́"],["лО́ктя","локтя́"],["мЕ́стностей","местносте́й"],
-  ["мозаИ́чный","моза́ичный"],["намЕ́рение","намере́ние"],["нЕ́друг","недру́г"],
-  ["нЕ́нависть","ненави́сть"],["новостЕ́й","но́востей"],["обеспЕ́чение","обеспече́ние"],
-  ["оптО́вый","о́птовый"],["освЕ́домиться","осведоми́ться"],["плодоносИ́ть","плодо́носить"],
-  ["пО́нял","поня́л"],["принЯ́ть","при́нять"],["прИ́нял","приня́л"],
-  ["сосредотОчение","сосредото́чение"],["столЯ́р","сто́ляр"],["тОртов","торто́в"],
-  ["украИнский","украи́нский"],["фенО́мен","фено́мен"],["ходА́тайство","ходата́йство"]
+  // Существительные
+  "аэропОрты", "аэропОртов", "бАнты", "бАнтов", "бОроду", "бухгАлтеров", "вероисповЕдание",
+  "водопровОд", "газопровОд", "граждАнство", "дефИс", "дешевИзна",
+  "диспансЕр", "договорЁнность", "докумЕнт", "досУг", "еретИк",
+  "жалюзИ", "знАчимость", "Иксы", "каталОг", "квартАл", "киломЕтр",
+  "кОнусов", "корЫсть", "крАны", "кремЕнь", "кремнЯ", "лЕкторов",
+  "лОктя", "локтЕй", "лыжнЯ", "мЕстностей", "намЕрение", "нЕдруг",
+  "недУг", "некролОг", "нЕнависть", "нефтепровОд", "новостЕй", "нОгтя",
+  "ногтЕй", "Отзыв", "отзЫв", "Отрочество", "партЕр", "портфЕль",
+  "придАное", "призЫв", "свЁкла", "сирОты", "созЫв", "сосредотОчение",
+  "срЕдства", "стАтуя", "столЯр", "тамОжня", "тОрты", "тОртов", "тУфля",
+  "цемЕнт", "цЕнтнер", "цепОчка", "шАрфы", "шофЁр", "экспЕрт",
+
+  // Прилагательные
+  "вернА", "знАчимый", "красИвее", "кУхонный", "ловкА", "мозаИчный",
+  "оптОвый", "прозорлИвый", "слИвовый",
+
+  // Глаголы и формы глаголов
+  "бралА", "бралАсь", "взялА", "взялАсь", "влилАсь", "ворвалАсь",
+  "воспринЯть", "воспринялА", "воссоздалА", "вручИт", "гналА", "гналАсь",
+  "добралА", "добралАсь", "дождалАсь", "дозвонИтся", "дозИровать",
+  "ждалА", "закУпорить", "занЯть", "зАнял", "занялА", "зАняли",
+  "заперлА", "запломбировАть", "защемИт", "звалА", "звонИт", "кАшлянуть",
+  "клАла", "клЕить", "крАлась", "кровоточИть", "лгалА", "лилА", "лилАсь",
+  "наделИт", "надорвалАсь", "назвалАсь", "накренИтся", "налилА", "нарвалА",
+  "начАть", "нАчал", "началА", "нАчали", "обзвонИт", "облегчИть",
+  "облегчИт", "облилАсь", "обнялАсь", "обогналА", "ободралА", "ободрИть",
+  "ободрИт", "ободрИться", "ободрИтся", "обострИть", "одолжИть", "одолжИт",
+  "озлОбить", "оклЕить", "окружИт", "опОшлить", "освЕдомиться", "освЕдомится",
+  "отбылА", "отдалА", "откУпорить", "отозвалА", "отозвалАсь", "перезвонИт",
+  "перелилА", "плодоносИть", "пломбировАть", "повторИт", "позвалА", "позвонИт",
+  "полилА", "положИть", "положИл", "понЯть", "понялА", "послАла", "прибЫть",
+  "прИбыл", "прибылА", "прИбыли", "принЯть", "прИнял", "принялА", "прИняли",
+  "рвалА", "сверлИт", "снялА", "создалА", "сорвалА", "убралА", "углубИть",
+  "укрепИт", "чЕрпать", "щемИт", "щЁлкать",
+
+  // Причастия и отглагольные прилагательные
+  "довезЁнный", "зАгнутый", "зАнятый", "занятА", "зАпертый", "заселЁнный",
+  "заселенА", "кровоточАщий", "нажИвший", "налИвший", "нанЯвшийся", "начАвший",
+  "нАчатый", "низведЁнный", "облегчЁнный", "ободрЁнный", "обострЁнный",
+  "отключЁнный", "повторЁнный", "поделЁнный", "понЯвший", "прИнятый",
+  "принятА", "приручЁнный", "прожИвший", "снятА", "сОгнутый", "углублЁнный",
+
+  // Деепричастия
+  "закУпорив", "начАв", "начАвшись", "отдАв", "понЯв", "прибЫв", "создАв",
+
+  // Наречия
+  "вОвремя", "дОверху", "дОнизу", "дОсуха", "зАсветло", "надОлго", "ненадОлго"
 ];
 
-// В заданиях ЕГЭ ровно один вариант намеренно дан с неправильным ударением.
-// Формы и ударения проверены по нормативному списку; банк можно расширять.
-const EXAM_TASKS = [
-  {items:["звонИ́т","тОрты","свЁкла","катА́лог","договОр"], wrong:3, correction:"каталО́г"},
-  {items:["красИ́вее","облегчИ́ть","щавЕ́ль","жалюзИ́","квАртал"], wrong:4, correction:"квартАл"},
-  {items:["бАнты","шАрфы","цЕ́мент","киломЕ́тр","диспансЕ́р"], wrong:2, correction:"цемЕ́нт"},
-  {items:["дозвонИ́тся","обеспЕ́чение","намЕ́рение","новостЕ́й","срЕ́дства"], wrong:1, correction:"обеспечЕ́ние"},
-  {items:["принЯ́ть","прИ́нял","пО́нял","столЯ́р","ходА́тайство"], wrong:2, correction:"понЯ́л"}
-];
+// Убираем возможные дубли, сохраняя исходный порядок.
+const WORD_BANK = [...new Set(WORDS)];
 
 const $ = id => document.getElementById(id);
-const screens = ["home","game","result"];
-let mode = "practice", queue = [], current = null, position = 0, correct = 0, wrong = 0;
-let answered = false, practiceSeen = new Set(), taskOrder = [], taskIndex = 0;
+const screens = ["home", "game", "result"];
+let mode = "practice";
+let queue = [];
+let current = null;
+let correct = 0;
+let wrong = 0;
+let answered = false;
+let practiceSeen = new Set();
+let taskIndex = 0;
+let totalExamTasks = 0;
+let selectedExamNumbers = new Set();
 
-function showScreen(name){ screens.forEach(s => $(s).classList.toggle("active",s===name)); }
-function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
-function start(selected){
-  mode=selected; correct=0; wrong=0; position=0; answered=false; practiceSeen=new Set();
-  $("mode-label").textContent=mode==="practice"?"ТРЕНИРОВКА":"ЗАДАНИЕ № 4 ЕГЭ";
-  if(mode==="practice"){
-    queue=shuffle(WORDS.map((w,i)=>{
-      const showCorrect = Math.random() < .55;
-      return {id:i, word:showCorrect ? w[0] : w[1], isCorrect:showCorrect, base:w[0]};
-    }));
-    // Для каждого слова создаём один показ; ошибочные ответы добавляются повторно с задержкой.
-  }else{
-    taskOrder=shuffle(EXAM_TASKS.map((_,i)=>i)); taskIndex=0;
-  }
-  showScreen("game"); nextQuestion();
+function showScreen(name) {
+  screens.forEach(screen => $(screen).classList.toggle("active", screen === name));
 }
-function updateProgress(){
-  const total=mode==="practice"?WORDS.length:EXAM_TASKS.length;
-  const done=mode==="practice"?practiceSeen.size:taskIndex;
-  $("counter").textContent=`${mode==="practice"?"СЛОВО":"ЗАДАНИЕ"} ${Math.min(done+1,total)} ИЗ ${total}`;
-  $("progress-percent").textContent=`${Math.round(done/total*100)}%`;
-  $("progress-fill").style.width=`${done/total*100}%`;
+
+function shuffle(array) {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
 }
-function nextQuestion(){
-  answered=false; $("feedback").textContent=""; $("feedback").className="feedback";
-  $("answers").innerHTML="";
-  if(mode==="practice"){
-    if(queue.length===0){finish();return;}
-    current=queue.shift(); position++;
-    $("question-kicker").textContent="ПРАВИЛЬНО ЛИ ПОСТАВЛЕНО УДАРЕНИЕ?";
-    $("question-word").textContent=current.word;
-    $("question-hint").textContent="Выбери один из вариантов ответа";
-    addAnswer("Правильно",current.isCorrect); addAnswer("Неправильно",!current.isCorrect);
-    updateProgress();
-  }else{
-    if(taskIndex>=taskOrder.length){finish();return;}
-    current=EXAM_TASKS[taskOrder[taskIndex]];
-    $("question-kicker").textContent="НАЙДИ СЛОВО С НЕВЕРНЫМ УДАРЕНИЕМ";
-    $("question-word").textContent="Выбери один вариант";
-    $("question-hint").textContent="В одном из слов ударение указано неправильно";
-    current.items.forEach((word,i)=>addAnswer(word,i===current.wrong));
-    updateProgress();
+
+function getStressedVowelIndex(word) {
+  return [...word].findIndex(char => char !== char.toLowerCase() && /[АЕЁИОУЫЭЮЯ]/i.test(char));
+}
+
+// Создаёт правдоподобный вариант с ошибочным ударением.
+// Ё в неверном варианте записывается как Е — как это бывает в КИМ ЕГЭ.
+function makeWrongVariant(correctWord) {
+  const letters = [...correctWord.toLocaleLowerCase("ru-RU").replaceAll("ё", "е")];
+  const originalStressIndex = getStressedVowelIndex(correctWord);
+  const vowelIndexes = letters
+    .map((char, index) => /[аеёиоуыэюя]/i.test(char) ? index : -1)
+    .filter(index => index !== -1 && index !== originalStressIndex);
+  if (vowelIndexes.length === 0) return correctWord;
+  const newStressIndex = vowelIndexes[Math.floor(Math.random() * vowelIndexes.length)];
+  letters[newStressIndex] = letters[newStressIndex].toLocaleUpperCase("ru-RU");
+  return letters.join("");
+}
+
+function makePracticeCard(word, id) {
+  const isCorrect = Math.random() < 0.55;
+  return {
+    id,
+    correctWord: word,
+    word: isCorrect ? word : makeWrongVariant(word),
+    isCorrect,
+    retries: 0
+  };
+}
+
+function start(selectedMode) {
+  mode = selectedMode;
+  correct = 0;
+  wrong = 0;
+  answered = false;
+  practiceSeen = new Set();
+  taskIndex = 0;
+  selectedExamNumbers = new Set();
+  $("mode-label").textContent = mode === "practice" ? "ТРЕНИРОВКА" : "ЗАДАНИЕ № 4 ЕГЭ";
+
+  if (mode === "practice") {
+    queue = shuffle(WORD_BANK.map((word, index) => makePracticeCard(word, index)));
+    totalExamTasks = 0;
+  } else {
+    // Каждое слово встречается в экзаменационном режиме один раз за прохождение.
+    const shuffledWords = shuffle(WORD_BANK);
+    queue = [];
+    for (let i = 0; i < shuffledWords.length; i += 5) {
+      const group = shuffledWords.slice(i, i + 5);
+      // Последнее задание тоже содержит пять вариантов: недостающие слова берём из начала банка.
+      if (group.length < 5) {
+        const fillers = shuffle(shuffledWords.slice(0, 5 - group.length));
+        group.push(...fillers);
+      }
+      const correctCount = 2 + Math.floor(Math.random() * 3); // 2, 3 или 4 верных варианта
+      const correctIndexes = new Set(shuffle([0, 1, 2, 3, 4]).slice(0, correctCount));
+      queue.push(group.map((word, index) => ({
+        word: correctIndexes.has(index) ? word : makeWrongVariant(word),
+        isCorrect: correctIndexes.has(index),
+        correctWord: word
+      })));
+    }
+    totalExamTasks = queue.length;
+  }
+
+  showScreen("game");
+  nextQuestion();
+}
+
+function updateProgress() {
+  if (mode === "practice") {
+    const done = practiceSeen.size;
+    const total = WORD_BANK.length;
+    $("counter").textContent = `СЛОВО ${Math.min(done + 1, total)} ИЗ ${total}`;
+    $("progress-percent").textContent = `${Math.round(done / total * 100)}%`;
+    $("progress-fill").style.width = `${done / total * 100}%`;
+  } else {
+    $("counter").textContent = `ЗАДАНИЕ ${Math.min(taskIndex + 1, totalExamTasks)} ИЗ ${totalExamTasks}`;
+    $("progress-percent").textContent = `${Math.round(taskIndex / totalExamTasks * 100)}%`;
+    $("progress-fill").style.width = `${taskIndex / totalExamTasks * 100}%`;
   }
 }
-function addAnswer(label,isCorrect){
-  const b=document.createElement("button"); b.className="answer-btn"; b.textContent=label;
-  b.addEventListener("click",()=>answer(isCorrect,b)); $("answers").appendChild(b);
+
+function resetQuestionArea() {
+  answered = false;
+  selectedExamNumbers = new Set();
+  $("feedback").textContent = "";
+  $("feedback").className = "feedback";
+  $("answers").innerHTML = "";
 }
-function answer(isCorrect,button){
-  if(answered)return; answered=true;
-  [...$("answers").children].forEach(b=>b.disabled=true);
-  if(isCorrect){correct++;$("feedback").textContent="Верно!";$("feedback").className="feedback good";button.classList.add("selected");}
-  else{wrong++;$("feedback").textContent="Не совсем. Правильный ответ выделен."; $("feedback").className="feedback bad";}
-  if(mode==="practice" && !isCorrect){
-    const delay=Math.min(4,Math.max(2,queue.length));
-    const showCorrect = Math.random() < .5;
-    const retry={...current,word:showCorrect?WORDS[current.id][0]:WORDS[current.id][1],isCorrect:showCorrect};
-    // Повторная карточка вставляется не сразу, а через несколько новых слов.
-    queue.splice(Math.min(delay,queue.length),0,retry);
+
+function nextQuestion() {
+  resetQuestionArea();
+
+  if (mode === "practice") {
+    if (queue.length === 0) {
+      finish();
+      return;
+    }
+    current = queue.shift();
+    $("question-kicker").textContent = "ПРАВИЛЬНО ЛИ ПОСТАВЛЕНО УДАРЕНИЕ?";
+    $("question-word").textContent = current.word;
+    $("question-hint").textContent = "Выбери один из вариантов ответа";
+    addPracticeAnswer("Правильно", current.isCorrect);
+    addPracticeAnswer("Неправильно", !current.isCorrect);
+  } else {
+    if (taskIndex >= totalExamTasks) {
+      finish();
+      return;
+    }
+    current = queue[taskIndex];
+    $("question-kicker").textContent = "УКАЖИТЕ ВСЕ ВАРИАНТЫ С ВЕРНЫМ УДАРЕНИЕМ";
+    $("question-word").textContent = "Выбери номера слов";
+    $("question-hint").textContent = "Нажми на все правильные варианты (от 1 до 5), затем ответь";
+    current.forEach((item, index) => addExamOption(item, index));
+    const submit = document.createElement("button");
+    submit.className = "exam-submit";
+    submit.textContent = "Ответить →";
+    submit.addEventListener("click", submitExamAnswer);
+    $("answers").appendChild(submit);
   }
-  if(mode==="exam" && !isCorrect){
-    [...$("answers").children].forEach((b,i)=>{if(i===current.wrong)b.classList.add("selected");});
-  }
-  if(mode==="exam"){
-    const note=document.createElement("div"); note.textContent=`Правильное ударение: ${current.correction}`; note.style.cssText="margin-top:12px;color:#b8f36b;font-size:12px"; $("feedback").appendChild(note);
-    taskIndex++;
-  }else{
-    practiceSeen.add(current.id);
-  }
-  const next=document.createElement("button");next.className="next-btn";next.textContent="Дальше →";next.addEventListener("click",nextQuestion);$("feedback").appendChild(document.createElement("br"));$("feedback").appendChild(next);
+
   updateProgress();
 }
-function finish(){
-  const total=correct+wrong, percent=total?Math.round(correct/total*100):0;
-  $("score-percent").textContent=percent+"%";$("score-correct").textContent=correct;
-  $("score-wrong").textContent=wrong;$("score-total").textContent=total;
-  $("result-message").textContent=percent>=90?"Отличный результат! Так держать.":percent>=70?"Хорошая работа. Ещё немного практики — и будет отлично.":"Есть что повторить. Попробуй ещё раз и закрепи сложные слова.";
-  $("progress-fill").style.width="100%";$("progress-percent").textContent="100%";
+
+function addPracticeAnswer(label, isCorrect) {
+  const button = document.createElement("button");
+  button.className = "answer-btn";
+  button.textContent = label;
+  button.addEventListener("click", () => answerPractice(isCorrect, button));
+  $("answers").appendChild(button);
+}
+
+function answerPractice(isCorrect, button) {
+  if (answered) return;
+  answered = true;
+  [...$("answers").querySelectorAll(".answer-btn")].forEach(item => item.disabled = true);
+
+  if (isCorrect) {
+    correct++;
+    $("feedback").textContent = "Верно!";
+    $("feedback").className = "feedback good";
+    button.classList.add("selected");
+  } else {
+    wrong++;
+    $("feedback").textContent = `Ошибка. Правильно: ${current.correctWord}`;
+    $("feedback").className = "feedback bad";
+    // Ошибочное слово возвращается в очередь через 2–4 карточки, максимум два повтора.
+    if (current.retries < 2) {
+      const retry = makePracticeCard(current.correctWord, current.id);
+      retry.retries = current.retries + 1;
+      const delay = Math.min(4, Math.max(2, queue.length));
+      queue.splice(Math.min(delay, queue.length), 0, retry);
+    }
+  }
+
+  practiceSeen.add(current.id);
+  addNextButton();
+  updateProgress();
+}
+
+function addExamOption(item, index) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "exam-option";
+  button.setAttribute("aria-pressed", "false");
+  button.innerHTML = `<span class="exam-number">${index + 1}</span><span class="exam-word"></span>`;
+  button.querySelector(".exam-word").textContent = item.word;
+  button.addEventListener("click", () => {
+    if (answered) return;
+    const number = index + 1;
+    if (selectedExamNumbers.has(number)) {
+      selectedExamNumbers.delete(number);
+      button.classList.remove("chosen");
+      button.setAttribute("aria-pressed", "false");
+    } else {
+      selectedExamNumbers.add(number);
+      button.classList.add("chosen");
+      button.setAttribute("aria-pressed", "true");
+    }
+    const picked = [...selectedExamNumbers].sort((a, b) => a - b);
+    $("question-hint").textContent = picked.length
+      ? `Выбрано: ${picked.join(", ")}`
+      : "Нажми на все правильные варианты (от 1 до 5), затем ответь";
+  });
+  $("answers").appendChild(button);
+}
+
+function submitExamAnswer() {
+  if (answered) return;
+  answered = true;
+  const selected = [...selectedExamNumbers].sort((a, b) => a - b);
+  const expected = current
+    .map((item, index) => item.isCorrect ? index + 1 : null)
+    .filter(number => number !== null);
+  const isCorrect = selected.length === expected.length && selected.every((number, index) => number === expected[index]);
+
+  if (isCorrect) {
+    correct++;
+    $("feedback").textContent = "Верно!";
+    $("feedback").className = "feedback good";
+  } else {
+    wrong++;
+    $("feedback").textContent = `Неверно. Правильные номера: ${expected.join(", ")}.`;
+    $("feedback").className = "feedback bad";
+  }
+
+  [...$("answers").querySelectorAll(".exam-option")].forEach((button, index) => {
+    button.disabled = true;
+    if (current[index].isCorrect) button.classList.add("answer-correct");
+    else if (selected.includes(index + 1)) button.classList.add("answer-wrong");
+  });
+  const submit = $("answers").querySelector(".exam-submit");
+  if (submit) submit.remove();
+  taskIndex++;
+  addNextButton();
+  updateProgress();
+}
+
+function addNextButton() {
+  const next = document.createElement("button");
+  next.className = "next-btn";
+  next.textContent = "Дальше →";
+  next.addEventListener("click", nextQuestion);
+  $("feedback").appendChild(document.createElement("br"));
+  $("feedback").appendChild(next);
+}
+
+function finish() {
+  const total = correct + wrong;
+  const percent = total ? Math.round(correct / total * 100) : 0;
+  $("score-percent").textContent = percent + "%";
+  $("score-correct").textContent = correct;
+  $("score-wrong").textContent = wrong;
+  $("score-total").textContent = total;
+  $("result-message").textContent = percent >= 90
+    ? "Отличный результат! Так держать."
+    : percent >= 70
+      ? "Хорошая работа. Ещё немного практики — и будет отлично."
+      : "Есть что повторить. Попробуй ещё раз и закрепи сложные слова.";
+  $("progress-fill").style.width = "100%";
+  $("progress-percent").textContent = "100%";
   showScreen("result");
 }
-document.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>start(b.dataset.mode)));
-$("exit").addEventListener("click",()=>showScreen("home"));
-$("again").addEventListener("click",()=>start(mode));
-$("to-home").addEventListener("click",()=>showScreen("home"));
+
+document.querySelectorAll("[data-mode]").forEach(button => {
+  button.addEventListener("click", () => start(button.dataset.mode));
+});
+$("exit").addEventListener("click", () => showScreen("home"));
+$("again").addEventListener("click", () => start(mode));
+$("to-home").addEventListener("click", () => showScreen("home"));
