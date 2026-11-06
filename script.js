@@ -107,7 +107,7 @@ const PHOTO_WORDS = [
   "мизЕрный",
   "договОр",
   "колОс",
-  "гербОвый",
+  "гЕрбовый",
   "пролилА",
   "перчИть",
   "жюрИ",
@@ -145,7 +145,14 @@ const PHOTO_WORDS = [
   "корЫсть",
   "созЫв",
   "отзЫв",
-  "квартАл"
+  "квартАл",
+  // Дополнительные формы и слова с фотографий пользователя.
+  "вЕрный", "красИвый", "красИвейший", "красИво", "лОвкий", "прозорлИва", "снЯтый",
+  "пОручни", "нарОст", "фетИш",
+  "жилОсь", "навралА", "наделИт", "совралА", "сорИт", "убралА",
+  "полИть", "сверлИть", "отозвАть",
+  "аэропОрт", "бАнт", "бородА", "бухгАлтер", "кран", "мЕстность",
+  "лОкоть", "кОнус", "нОвость", "нОготь", "срЕдство", "шАрф", "тОрт"
 ];
 WORDS.push(...PHOTO_WORDS);
 
@@ -157,7 +164,8 @@ const WORD_CONTEXTS = {
   "Отзыв": "о книге",
   "отзЫв": "посла",
   "языковАя": "система",
-  "языкОвая": "колбаса"
+  "языкОвая": "колбаса",
+  "ловкА": "Она",
 };
 
 
@@ -191,9 +199,11 @@ function getStressedVowelIndex(word) {
   return [...word].findIndex(char => char !== char.toLowerCase() && /[АЕЁИОУЫЭЮЯ]/i.test(char));
 }
 
-function formatTestItem(word) {
-  const context = WORD_CONTEXTS[word];
-  return context ? `${word} ${context}` : word;
+function formatTestItem(displayWord, sourceWord = displayWord) {
+  const context = WORD_CONTEXTS[sourceWord];
+  if (!context) return displayWord;
+  // Сочетание показываем и при правильном, и при намеренно ошибочном ударении.
+  return sourceWord === "ловкА" ? `${context} ${displayWord}` : `${displayWord} ${context}`;
 }
 
 // Создаёт правдоподобный вариант с ошибочным ударением.
@@ -294,7 +304,7 @@ function nextQuestion() {
     }
     current = queue.shift();
     $("question-kicker").textContent = "ПРАВИЛЬНО ЛИ ПОСТАВЛЕНО УДАРЕНИЕ?";
-    $("question-word").textContent = formatTestItem(current.word);
+    $("question-word").textContent = formatTestItem(current.word, current.correctWord);
     $("question-hint").textContent = "Выбери один из вариантов ответа";
     addPracticeAnswer("Правильно", current.isCorrect);
     addPracticeAnswer("Неправильно", !current.isCorrect);
@@ -360,7 +370,7 @@ function addExamOption(item, index) {
   button.className = "exam-option";
   button.setAttribute("aria-pressed", "false");
   button.innerHTML = `<span class="exam-number">${index + 1}</span><span class="exam-copy"><span class="exam-word"></span></span>`;
-  button.querySelector(".exam-word").textContent = formatTestItem(item.word);
+  button.querySelector(".exam-word").textContent = formatTestItem(item.word, item.correctWord);
   button.addEventListener("click", () => {
     if (answered) return;
     const number = index + 1;
