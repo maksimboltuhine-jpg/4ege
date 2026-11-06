@@ -88,8 +88,9 @@ const PHOTO_WORDS = [
   "мЕльком",
   "зевОта",
   "языковАя",
+  "языкОвая",
   "пробылА",
-  "знамЕние",
+  "знАмение",
   "дремОта",
   "танцОвщица",
   "облегчИм",
@@ -114,7 +115,7 @@ const PHOTO_WORDS = [
   "диалОг",
   "монолОг",
   "эпилОг",
-  "аналОг",
+  "анАлог",
   "газопровОд",
   "школЯр",
   "малЯр",
@@ -133,6 +134,7 @@ const PHOTO_WORDS = [
   "придАное",
   "бухгАлтеров",
   "сиротА",
+  "сирОт", "сирОтам", "сирОтами", "сирОтах",
   "Иконопись",
   "давнИшний",
   "закУпорить",
@@ -149,6 +151,22 @@ WORDS.push(...PHOTO_WORDS);
 
 // Убираем возможные дубли, сохраняя исходный порядок.
 const WORD_BANK = [...new Set(WORDS)];
+
+// Контекст показывается только там, где от значения зависит ударение.
+const WORD_CONTEXTS = {
+  "Отзыв": "о́тзыв посла — его возвращение",
+  "отзЫв": "отзы́в о книге — мнение, отклик",
+  "языковАя": "языкова́я система — относящаяся к речи и языку",
+  "языкОвая": "языко́вая колбаса — приготовленная из языка",
+  "сиротА": "сирота́ — единственное число",
+  "сирОты": "сиро́ты — множественное число",
+  "сирОт": "сиро́т — родительный падеж множественного числа",
+  "сирОтам": "сиро́там — дательный падеж множественного числа",
+  "сирОтами": "сиро́тами — творительный падеж множественного числа",
+  "сирОтах": "сиро́тах — предложный падеж множественного числа",
+  "анАлог": "ана́лог — ударение на втором слоге; не путать с каталОг"
+};
+
 
 const $ = id => document.getElementById(id);
 const screens = ["home", "game", "result"];
@@ -199,6 +217,7 @@ function makePracticeCard(word, id) {
   return {
     id,
     correctWord: word,
+    context: WORD_CONTEXTS[word] || "",
     word: isCorrect ? word : makeWrongVariant(word),
     isCorrect,
     retries: 0
@@ -234,7 +253,8 @@ function start(selectedMode) {
       queue.push(group.map((word, index) => ({
         word: correctIndexes.has(index) ? word : makeWrongVariant(word),
         isCorrect: correctIndexes.has(index),
-        correctWord: word
+        correctWord: word,
+        context: WORD_CONTEXTS[word] || ""
       })));
     }
     totalExamTasks = queue.length;
@@ -277,7 +297,7 @@ function nextQuestion() {
     current = queue.shift();
     $("question-kicker").textContent = "ПРАВИЛЬНО ЛИ ПОСТАВЛЕНО УДАРЕНИЕ?";
     $("question-word").textContent = current.word;
-    $("question-hint").textContent = "Выбери один из вариантов ответа";
+    $("question-hint").textContent = current.context || "Выбери один из вариантов ответа";
     addPracticeAnswer("Правильно", current.isCorrect);
     addPracticeAnswer("Неправильно", !current.isCorrect);
   } else {
@@ -341,8 +361,9 @@ function addExamOption(item, index) {
   button.type = "button";
   button.className = "exam-option";
   button.setAttribute("aria-pressed", "false");
-  button.innerHTML = `<span class="exam-number">${index + 1}</span><span class="exam-word"></span>`;
+  button.innerHTML = `<span class="exam-number">${index + 1}</span><span class="exam-copy"><span class="exam-word"></span><small class="exam-context"></small></span>`;
   button.querySelector(".exam-word").textContent = item.word;
+  button.querySelector(".exam-context").textContent = item.context;
   button.addEventListener("click", () => {
     if (answered) return;
     const number = index + 1;
