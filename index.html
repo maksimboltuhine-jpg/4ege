@@ -32,7 +32,7 @@
           <span class="mode-number">02 / ЕГЭ</span>
           <span class="mode-icon">⌁</span>
           <strong>Задание № 4</strong>
-          <span class="mode-description">Выбери все слова, в которых ударение выделено правильно. Отметь номера от 1 до 5.</span>
+          <span class="mode-description">Выбери все слова, в которых ударение выделено правильно. В ответе всегда от 2 до 4 номеров.</span>
           <span class="mode-link">Решать задание <b>→</b></span>
         </button>
       </div>
@@ -44,7 +44,7 @@
         <button id="exit" class="back">← <span>На главную</span></button>
         <span id="mode-label" class="pill">ТРЕНИРОВКА</span>
       </div>
-      <div class="progress-meta"><span id="counter">СЛОВО 1 ИЗ 20</span><span id="progress-percent">0%</span></div>
+      <div class="progress-meta"><span id="counter">СЛОВО 1 ИЗ 20</span><span id="timer-display" class="timer-display" hidden>3:00</span><span id="progress-percent">0%</span></div>
       <div class="progress-track"><div id="progress-fill"></div></div>
       <div class="question-card">
         <div id="question-kicker" class="question-kicker">ПРАВИЛЬНО ЛИ ПОСТАВЛЕНО УДАРЕНИЕ?</div>
@@ -74,6 +74,19 @@
       </div>
     </section>
     <footer>УДАРЕНИЕ <span>·</span> ТРЕНАЖЁР РУССКОГО ЯЗЫКА</footer>
+
+  <div id="practice-modal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="practice-modal-title">
+      <div class="eyebrow"><span class="dot"></span> ВЫБОР РЕЖИМА</div>
+      <h2 id="practice-modal-title">Как тренируемся?</h2>
+      <p>Выбери ограничение по времени для режима «Верно или неверно?»</p>
+      <div class="modal-actions">
+        <button id="practice-3min" class="primary-btn">3 минуты <span>→</span></button>
+        <button id="practice-no-time" class="secondary-btn">Без времени</button>
+      </div>
+      <button id="practice-cancel" class="modal-cancel">Назад</button>
+    </div>
+  </div>
   </main>
   <script src="script.js"></script>
 </body>

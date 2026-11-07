@@ -29,7 +29,7 @@ const WORDS = [
   "начАть", "нАчал", "началА", "нАчали", "обзвонИт", "облегчИть",
   "облегчИт", "облилАсь", "обнялАсь", "обогналА", "ободралА", "ободрИть",
   "ободрИт", "ободрИться", "ободрИтся", "обострИть", "одолжИть", "одолжИт",
-  "озлОбить", "оклЕить", "окружИт", "опОшлить", "освЕдомиться", "освЕдомится",
+  "озлОбить", "оклЕить", "окружИт", "опОшлить", "осведомИться", "осведомИтся",
   "отбылА", "отдалА", "откУпорить", "отозвалА", "отозвалАсь", "перезвонИт",
   "перелилА", "плодоносИть", "пломбировАть", "повторИт", "позвалА", "позвонИт",
   "полилА", "положИть", "положИл", "понЯть", "понялА", "послАла", "прибЫть",
@@ -67,7 +67,7 @@ const PHOTO_WORDS = [
   "убыстрИть",
   "заселенА",
   "молЯщий",
-  "освЕдомишься",
+  "осведомИшься",
   "кормЯщий",
   "включЁнный",
   "добелА",
@@ -96,7 +96,7 @@ const PHOTO_WORDS = [
   "облегчИм",
   "мусоропровОд",
   "включИшь",
-  "августОвский",
+  "Августовский",
   "умЕрший",
   "скОльких",
   "приручЁнный",
@@ -152,12 +152,18 @@ const PHOTO_WORDS = [
   "жилОсь", "навралА", "наделИт", "совралА", "сорИт", "убралА",
   "полИть", "сверлИть", "отозвАть",
   "аэропОрт", "бАнт", "бородА", "бухгАлтер", "кран", "мЕстность",
-  "лОкоть", "кОнус", "нОвость", "нОготь", "срЕдство", "шАрф", "тОрт"
+  "лОкоть", "кОнус", "нОвость", "нОготь", "срЕдство", "шАрф", "тОрт",
+  // Новые слова с последних фотографий (ударения сверены).
+  "ревЕнь", "ломотА", "новорождЁнный", "балУет", "созданА",
+  "премировАть", "переключИт", "христианИн", "отослАла", "вручЁнный",
+  "созвонИмся", "балОванный", "нОгтя", "в скОльких"
 ];
 WORDS.push(...PHOTO_WORDS);
 
-// Убираем возможные дубли, сохраняя исходный порядок.
-const WORD_BANK = [...new Set(WORDS)];
+// Убираем дубли и односложные слова: в них нельзя создать вариант с другим ударением.
+const countVowels = value => ([...value.toLocaleLowerCase("ru-RU").replaceAll("ё", "е")]
+  .filter(char => /[аеёиоуыэюя]/i.test(char)).length);
+const WORD_BANK = [...new Set(WORDS)].filter(word => countVowels(word) >= 2);
 
 // Контекст показывается только там, где от значения зависит ударение.
 const WORD_CONTEXTS = {
@@ -181,6 +187,10 @@ let practiceSeen = new Set();
 let taskIndex = 0;
 let totalExamTasks = 0;
 let selectedExamNumbers = new Set();
+let practiceTimed = false;
+let practiceTimeLeft = 0;
+let practiceTimerId = null;
+let practiceAnswered = 0;
 
 function showScreen(name) {
   screens.forEach(screen => $(screen).classList.toggle("active", screen === name));
@@ -232,8 +242,38 @@ function makePracticeCard(word, id) {
   };
 }
 
+function stopPracticeTimer() {
+  if (practiceTimerId !== null) {
+    clearInterval(practiceTimerId);
+    practiceTimerId = null;
+  }
+}
+
+function openPracticeOptions() {
+  $("practice-modal").classList.add("open");
+  $("practice-modal").setAttribute("aria-hidden", "false");
+}
+
+function closePracticeOptions() {
+  $("practice-modal").classList.remove("open");
+  $("practice-modal").setAttribute("aria-hidden", "true");
+}
+
 function start(selectedMode) {
+  if (selectedMode === "practice") {
+    openPracticeOptions();
+    return;
+  }
+  begin(selectedMode, 0);
+}
+
+function begin(selectedMode, durationSeconds = 0) {
+  stopPracticeTimer();
+  closePracticeOptions();
   mode = selectedMode;
+  practiceTimed = mode === "practice" && durationSeconds > 0;
+  practiceTimeLeft = durationSeconds;
+  practiceAnswered = 0;
   correct = 0;
   wrong = 0;
   answered = false;
@@ -269,16 +309,42 @@ function start(selectedMode) {
   }
 
   showScreen("game");
+  $("timer-display").hidden = !practiceTimed;
+  if (practiceTimed) {
+    updateTimerDisplay();
+  }
   nextQuestion();
+  if (practiceTimed) {
+    practiceTimerId = setInterval(() => {
+      practiceTimeLeft = Math.max(0, practiceTimeLeft - 1);
+      updateTimerDisplay();
+      updateProgress();
+      if (practiceTimeLeft <= 0) finish();
+    }, 1000);
+  }
+}
+
+function updateTimerDisplay() {
+  const minutes = Math.floor(practiceTimeLeft / 60);
+  const seconds = practiceTimeLeft % 60;
+  $("timer-display").textContent = `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
 function updateProgress() {
   if (mode === "practice") {
-    const done = practiceSeen.size;
-    const total = WORD_BANK.length;
-    $("counter").textContent = `СЛОВО ${Math.min(done + 1, total)} ИЗ ${total}`;
-    $("progress-percent").textContent = `${Math.round(done / total * 100)}%`;
-    $("progress-fill").style.width = `${done / total * 100}%`;
+    if (practiceTimed) {
+      const elapsed = 180 - practiceTimeLeft;
+      const percent = Math.min(100, Math.round(elapsed / 180 * 100));
+      $("counter").textContent = `ОТВЕТОВ: ${practiceAnswered}`;
+      $("progress-percent").textContent = `${percent}%`;
+      $("progress-fill").style.width = `${percent}%`;
+    } else {
+      const done = practiceSeen.size;
+      const total = WORD_BANK.length;
+      $("counter").textContent = `СЛОВО ${Math.min(done + 1, total)} ИЗ ${total}`;
+      $("progress-percent").textContent = `${Math.round(done / total * 100)}%`;
+      $("progress-fill").style.width = `${done / total * 100}%`;
+    }
   } else {
     $("counter").textContent = `ЗАДАНИЕ ${Math.min(taskIndex + 1, totalExamTasks)} ИЗ ${totalExamTasks}`;
     $("progress-percent").textContent = `${Math.round(taskIndex / totalExamTasks * 100)}%`;
@@ -299,8 +365,12 @@ function nextQuestion() {
 
   if (mode === "practice") {
     if (queue.length === 0) {
-      finish();
-      return;
+      if (practiceTimed) {
+        queue = shuffle(WORD_BANK.map((word, index) => makePracticeCard(word, `${practiceAnswered}-${index}`)));
+      } else {
+        finish();
+        return;
+      }
     }
     current = queue.shift();
     $("question-kicker").textContent = "ПРАВИЛЬНО ЛИ ПОСТАВЛЕНО УДАРЕНИЕ?";
@@ -316,7 +386,7 @@ function nextQuestion() {
     current = queue[taskIndex];
     $("question-kicker").textContent = "УКАЖИТЕ ВСЕ ВАРИАНТЫ С ВЕРНЫМ УДАРЕНИЕМ";
     $("question-word").textContent = "Выбери номера слов";
-    $("question-hint").textContent = "Нажми на все правильные варианты (от 1 до 5), затем ответь";
+    $("question-hint").textContent = "Выбери от 2 до 4 вариантов, затем ответь";
     current.forEach((item, index) => addExamOption(item, index));
     const submit = document.createElement("button");
     submit.className = "exam-submit";
@@ -360,6 +430,7 @@ function answerPractice(isCorrect, button) {
   }
 
   practiceSeen.add(current.id);
+  practiceAnswered++;
   addNextButton();
   updateProgress();
 }
@@ -379,22 +450,30 @@ function addExamOption(item, index) {
       button.classList.remove("chosen");
       button.setAttribute("aria-pressed", "false");
     } else {
+      if (selectedExamNumbers.size >= 4) {
+        $("question-hint").textContent = "Можно выбрать не больше 4 вариантов.";
+        return;
+      }
       selectedExamNumbers.add(number);
       button.classList.add("chosen");
       button.setAttribute("aria-pressed", "true");
     }
     const picked = [...selectedExamNumbers].sort((a, b) => a - b);
     $("question-hint").textContent = picked.length
-      ? `Выбрано: ${picked.join(", ")}`
-      : "Нажми на все правильные варианты (от 1 до 5), затем ответь";
+      ? `Выбрано: ${picked.join(", ")}. Правильных ответов в задании — от 2 до 4.`
+      : "Выбери от 2 до 4 вариантов, затем ответь";
   });
   $("answers").appendChild(button);
 }
 
 function submitExamAnswer() {
   if (answered) return;
-  answered = true;
   const selected = [...selectedExamNumbers].sort((a, b) => a - b);
+  if (selected.length < 2 || selected.length > 4) {
+    $("question-hint").textContent = "Нужно выбрать от 2 до 4 вариантов.";
+    return;
+  }
+  answered = true;
   const expected = current
     .map((item, index) => item.isCorrect ? index + 1 : null)
     .filter(number => number !== null);
@@ -432,6 +511,7 @@ function addNextButton() {
 }
 
 function finish() {
+  stopPracticeTimer();
   const total = correct + wrong;
   const percent = total ? Math.round(correct / total * 100) : 0;
   $("score-percent").textContent = percent + "%";
@@ -451,6 +531,19 @@ function finish() {
 document.querySelectorAll("[data-mode]").forEach(button => {
   button.addEventListener("click", () => start(button.dataset.mode));
 });
-$("exit").addEventListener("click", () => showScreen("home"));
+$("practice-3min").addEventListener("click", () => begin("practice", 180));
+$("practice-no-time").addEventListener("click", () => begin("practice", 0));
+$("practice-cancel").addEventListener("click", closePracticeOptions);
+$("practice-modal").addEventListener("click", event => {
+  if (event.target === $("practice-modal")) closePracticeOptions();
+});
+$("exit").addEventListener("click", () => {
+  stopPracticeTimer();
+  closePracticeOptions();
+  showScreen("home");
+});
 $("again").addEventListener("click", () => start(mode));
-$("to-home").addEventListener("click", () => showScreen("home"));
+$("to-home").addEventListener("click", () => {
+  stopPracticeTimer();
+  showScreen("home");
+});
