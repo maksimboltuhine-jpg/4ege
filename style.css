@@ -39,3 +39,15 @@
 .mistakes-panel h3{margin:0 0 12px;font-size:14px}
 .mistakes-panel ul{margin:0;padding-left:20px;color:#cbd5e1;line-height:1.9;font-size:14px}
 [hidden]{display:none!important}
+
+
+/* Скрытая зона на цифре 4: не меняет внешний вид и курсор при наведении. */
+#secret-word-trigger{cursor:inherit;color:inherit;font:inherit;letter-spacing:inherit}
+.word-bank-card{max-height:min(82vh,850px);display:flex;flex-direction:column}
+.word-bank-count{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:1px;margin:8px 0 12px}
+.word-bank-list{list-style:none;margin:0 0 18px;padding:0 8px 0 0;overflow:auto;columns:2;column-gap:28px;color:#dce4ef;font-size:13px;line-height:1.9}
+.word-bank-list li{break-inside:avoid;border-bottom:1px solid #ffffff0b;padding:2px 0}
+.word-bank-card #word-bank-close{flex:0 0 auto}
+@media(max-width:620px){.word-bank-list{columns:1}.word-bank-card{max-height:85vh}}
+/* Наведение именно на скрытую цифру не должно активировать эффект карточки. */
+.mode-card:has(#secret-word-trigger:hover){border-color:var(--line);transform:none}

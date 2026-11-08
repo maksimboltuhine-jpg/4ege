@@ -67,7 +67,7 @@ const PHOTO_WORDS = [
   "убыстрИть",
   "заселенА",
   "молЯщий",
-  "осведомИшься",
+  "освЕдомишься",
   "кормЯщий",
   "включЁнный",
   "добелА",
@@ -96,7 +96,7 @@ const PHOTO_WORDS = [
   "облегчИм",
   "мусоропровОд",
   "включИшь",
-  "Августовский",
+  "А́вгустовский",
   "умЕрший",
   "скОльких",
   "приручЁнный",
@@ -151,19 +151,24 @@ const PHOTO_WORDS = [
   "пОручни", "нарОст", "фетИш",
   "жилОсь", "навралА", "наделИт", "совралА", "сорИт", "убралА",
   "полИть", "сверлИть", "отозвАть",
-  "аэропОрт", "бАнт", "бородА", "бухгАлтер", "кран", "мЕстность",
+  "аэропОрт", "бАнт", "бородА", "бухгАлтер", "мЕстность",
   "лОкоть", "кОнус", "нОвость", "нОготь", "срЕдство", "шАрф", 
   // Новые слова с последних фотографий (ударения сверены).
-  "ревЕнь", "лОмота", "новорождЁнный", "балУет", "созданА",
+  "ревЕнь", "ломОта", "новорождЁнный", "балУет", "созданА",
   "премировАть", "переключИт", "христианИн", "отослАла", "вручЁнный",
   "созвонИмся", "балОванный", "нОгтя", "в скОльких"
 ];
 WORDS.push(...PHOTO_WORDS);
 
 // Убираем дубли и односложные слова: в них нельзя создать вариант с другим ударением.
-const countVowels = value => ([...value.toLocaleLowerCase("ru-RU").replaceAll("ё", "е")]
-  .filter(char => /[аеёиоуыэюя]/i.test(char)).length);
-const WORD_BANK = [...new Set(WORDS)].filter(word => countVowels(word) >= 2);
+const stripStressMark = value => value.replaceAll("\u0301", "");
+const countVowels = value => [...stripStressMark(value).toLocaleLowerCase("ru-RU")]
+  .filter(char => /[аеёиоуыэюя]/i.test(char)).length;
+// В односложных словах нельзя сделать корректную пару «верно/неверно».
+// Дополнительно исключаем формы без явно заданного ударения, чтобы не появлялись карточки вроде «кран».
+const WORD_BANK = [...new Set(WORDS)].filter(word =>
+  countVowels(word) >= 2 && getStressedVowelIndex(stripStressMark(word)) >= 0
+);
 
 // Контекст показывается только там, где от значения зависит ударение.
 const WORD_CONTEXTS = {
@@ -207,7 +212,7 @@ function shuffle(array) {
 }
 
 function getStressedVowelIndex(word) {
-  return [...word].findIndex(char => char !== char.toLowerCase() && /[АЕЁИОУЫЭЮЯ]/i.test(char));
+  return [...stripStressMark(word)].findIndex(char => char !== char.toLowerCase() && /[АЕЁИОУЫЭЮЯ]/i.test(char));
 }
 
 function formatTestItem(displayWord, sourceWord = displayWord) {
@@ -220,7 +225,7 @@ function formatTestItem(displayWord, sourceWord = displayWord) {
 // Создаёт правдоподобный вариант с ошибочным ударением.
 // Ё в неверном варианте записывается как Е — как это бывает в КИМ ЕГЭ.
 function makeWrongVariant(correctWord) {
-  const letters = [...correctWord.toLocaleLowerCase("ru-RU").replaceAll("ё", "е")];
+  const letters = [...stripStressMark(correctWord).toLocaleLowerCase("ru-RU").replaceAll("ё", "е")];
   const originalStressIndex = getStressedVowelIndex(correctWord);
   const vowelIndexes = letters
     .map((char, index) => /[аеёиоуыэюя]/i.test(char) ? index : -1)
@@ -553,6 +558,41 @@ function finish() {
   $("progress-percent").textContent = "100%";
   showScreen("result");
 }
+
+// Скрытый личный справочник: открывается нажатием на цифру «4» в главном меню.
+const secretWordTrigger = $("secret-word-trigger");
+const wordBankModal = $("word-bank-modal");
+function openWordBank() {
+  if (!$('home').classList.contains('active')) return;
+  const list = $("word-bank-list");
+  list.replaceChildren();
+  const sortedWords = [...WORD_BANK].sort((a, b) =>
+    a.localeCompare(b, "ru-RU", { sensitivity: "base" })
+  );
+  sortedWords.forEach(word => {
+    const item = document.createElement("li");
+    item.textContent = formatTestItem(word, word);
+    list.appendChild(item);
+  });
+  $("word-bank-count").textContent = `Всего слов: ${sortedWords.length}`;
+  wordBankModal.classList.add("open");
+  wordBankModal.setAttribute("aria-hidden", "false");
+}
+function closeWordBank() {
+  wordBankModal.classList.remove("open");
+  wordBankModal.setAttribute("aria-hidden", "true");
+}
+secretWordTrigger.addEventListener("click", event => {
+  event.stopPropagation();
+  openWordBank();
+});
+$("word-bank-close").addEventListener("click", closeWordBank);
+wordBankModal.addEventListener("click", event => {
+  if (event.target === wordBankModal) closeWordBank();
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeWordBank();
+});
 
 document.querySelectorAll("[data-mode]").forEach(button => {
   button.addEventListener("click", () => start(button.dataset.mode));

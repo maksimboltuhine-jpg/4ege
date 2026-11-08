@@ -31,7 +31,7 @@
         <button class="mode-card" data-mode="exam">
           <span class="mode-number">02 / ЕГЭ</span>
           <span class="mode-icon">⌁</span>
-          <strong>Задание № 4</strong>
+          <strong>Задание № <span id="secret-word-trigger">4</span></strong>
           <span class="mode-description">Выбери все слова, в которых ударение выделено правильно. В ответе всегда от 2 до 4 номеров.</span>
           <span class="mode-link">Решать задание <b>→</b></span>
         </button>
@@ -79,6 +79,17 @@
       </div>
     </section>
     <footer>УДАРЕНИЕ <span>·</span> ТРЕНАЖЁР РУССКОГО ЯЗЫКА</footer>
+
+  <div id="word-bank-modal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-card word-bank-card" role="dialog" aria-modal="true" aria-labelledby="word-bank-title">
+      <div class="eyebrow"><span class="dot"></span> СПРАВОЧНИК</div>
+      <h2 id="word-bank-title">Все слова</h2>
+      <p>Список слов из тренажёра с правильными ударениями.</p>
+      <div id="word-bank-count" class="word-bank-count"></div>
+      <ul id="word-bank-list" class="word-bank-list"></ul>
+      <button id="word-bank-close" class="secondary-btn">Закрыть</button>
+    </div>
+  </div>
 
   <div id="practice-modal" class="modal-overlay" aria-hidden="true">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="practice-modal-title">
