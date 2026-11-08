@@ -33,3 +33,9 @@
 .modal-actions button{min-height:50px}
 .modal-cancel{display:block;margin:18px auto 0;border:0;background:none;color:var(--muted);font:700 12px Manrope;cursor:pointer}
 @media(max-width:620px){.modal-card{padding:24px 18px}.modal-actions{grid-template-columns:1fr}.progress-meta{gap:8px;font-size:9px}}
+
+.mistakes-toggle{margin-top:18px}
+.mistakes-panel{margin-top:14px;padding:20px 24px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.mistakes-panel h3{margin:0 0 12px;font-size:14px}
+.mistakes-panel ul{margin:0;padding-left:20px;color:#cbd5e1;line-height:1.9;font-size:14px}
+[hidden]{display:none!important}

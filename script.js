@@ -11,7 +11,7 @@ const WORDS = [
   "недУг", "некролОг", "нЕнависть", "нефтепровОд", "новостЕй", "нОгтя",
   "ногтЕй", "Отзыв", "отзЫв", "Отрочество", "партЕр", "портфЕль",
   "придАное", "призЫв", "свЁкла", "сирОты", "созЫв", "сосредотОчение",
-  "срЕдства", "стАтуя", "столЯр", "тамОжня", "тОрты", "тОртов", "тУфля",
+  "срЕдства", "стАтуя", "столЯр", "тамОжня", "тУфля",
   "цемЕнт", "цЕнтнер", "цепОчка", "шАрфы", "шофЁр", "экспЕрт",
 
   // Прилагательные
@@ -78,7 +78,7 @@ const PHOTO_WORDS = [
   "прИбыл",
   "понЯвший",
   "снятА",
-  "кЕдровый",
+  "кедрОвый",
   "переключИшь",
   "ходАтайство",
   "щавЕль",
@@ -122,7 +122,7 @@ const PHOTO_WORDS = [
   "бАнтом",
   "шАрфами",
   "аэропОртов",
-  "тОрту",
+  
   "зАгодя",
   "зАтемно",
   "докраснА",
@@ -152,9 +152,9 @@ const PHOTO_WORDS = [
   "жилОсь", "навралА", "наделИт", "совралА", "сорИт", "убралА",
   "полИть", "сверлИть", "отозвАть",
   "аэропОрт", "бАнт", "бородА", "бухгАлтер", "кран", "мЕстность",
-  "лОкоть", "кОнус", "нОвость", "нОготь", "срЕдство", "шАрф", "тОрт",
+  "лОкоть", "кОнус", "нОвость", "нОготь", "срЕдство", "шАрф", 
   // Новые слова с последних фотографий (ударения сверены).
-  "ревЕнь", "ломотА", "новорождЁнный", "балУет", "созданА",
+  "ревЕнь", "лОмота", "новорождЁнный", "балУет", "созданА",
   "премировАть", "переключИт", "христианИн", "отослАла", "вручЁнный",
   "созвонИмся", "балОванный", "нОгтя", "в скОльких"
 ];
@@ -191,6 +191,7 @@ let practiceTimed = false;
 let practiceTimeLeft = 0;
 let practiceTimerId = null;
 let practiceAnswered = 0;
+let practiceMistakes = new Map();
 
 function showScreen(name) {
   screens.forEach(screen => $(screen).classList.toggle("active", screen === name));
@@ -274,6 +275,7 @@ function begin(selectedMode, durationSeconds = 0) {
   practiceTimed = mode === "practice" && durationSeconds > 0;
   practiceTimeLeft = durationSeconds;
   practiceAnswered = 0;
+  practiceMistakes = new Map();
   correct = 0;
   wrong = 0;
   answered = false;
@@ -418,6 +420,7 @@ function answerPractice(isCorrect, button) {
     button.classList.add("selected");
   } else {
     wrong++;
+    practiceMistakes.set(current.correctWord, current.correctWord);
     $("feedback").textContent = `Ошибка. Правильно: ${current.correctWord}`;
     $("feedback").className = "feedback bad";
     // Ошибочное слово возвращается в очередь через 2–4 карточки, максимум два повтора.
@@ -518,6 +521,29 @@ function finish() {
   $("score-correct").textContent = correct;
   $("score-wrong").textContent = wrong;
   $("score-total").textContent = total;
+  const mistakesButton = $("show-mistakes");
+  const mistakesPanel = $("mistakes-panel");
+  if (mode === "practice") {
+    mistakesButton.hidden = false;
+    mistakesPanel.hidden = true;
+    mistakesButton.textContent = `Мои ошибки (${practiceMistakes.size})`;
+    const list = $("mistakes-list");
+    list.innerHTML = "";
+    if (practiceMistakes.size === 0) {
+      const item = document.createElement("li");
+      item.textContent = "Ошибок нет — отлично!";
+      list.appendChild(item);
+    } else {
+      [...practiceMistakes.values()].forEach(word => {
+        const item = document.createElement("li");
+        item.textContent = formatTestItem(word, word);
+        list.appendChild(item);
+      });
+    }
+  } else {
+    mistakesButton.hidden = true;
+    mistakesPanel.hidden = true;
+  }
   $("result-message").textContent = percent >= 90
     ? "Отличный результат! Так держать."
     : percent >= 70
@@ -541,6 +567,13 @@ $("exit").addEventListener("click", () => {
   stopPracticeTimer();
   closePracticeOptions();
   showScreen("home");
+});
+$("show-mistakes").addEventListener("click", () => {
+  const panel = $("mistakes-panel");
+  panel.hidden = !panel.hidden;
+  $("show-mistakes").textContent = panel.hidden
+    ? `Мои ошибки (${practiceMistakes.size})`
+    : "Скрыть ошибки";
 });
 $("again").addEventListener("click", () => start(mode));
 $("to-home").addEventListener("click", () => {
